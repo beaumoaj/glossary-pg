@@ -1,7 +1,10 @@
 import http from "http";
+import dotenv from "dotenv";
 
 import app from "./app";
 import { connectDb, disconnectDb } from "./db";
+
+dotenv.config();
 
 const port = parseInt(process.env.PORT || "3000");
 
