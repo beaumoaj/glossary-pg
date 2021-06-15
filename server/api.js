@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const jwt = require("jsonwebtoken");
 const { database } = require("./db");
+const bcrypt = require("bcrypt");
 
 const DBG = 1;
 function debug(message) {
