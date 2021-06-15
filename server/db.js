@@ -10,6 +10,9 @@ if (dbUrl) {
 	config = {
 		connectionString: dbUrl,
 		connectionTimeoutMillis: 5000,
+		ssl: {
+			rejectUnauthorized: false
+		}
 	};
 } else {
 	config = {
