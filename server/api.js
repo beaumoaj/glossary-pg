@@ -22,6 +22,8 @@ function generateAccessToken(username) {
 }
 
 function authenticateToken(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     if (USE_AUTH) {
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1];
@@ -179,6 +181,9 @@ router.post("/terms/resources/delete", authenticateToken, function (req, res) {
 });
 
 router.get("/terms", function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
     const query = "SELECT id, term, definition FROM terms";
     database
         .query(query)
@@ -198,6 +203,8 @@ router.get("/terms", function (req, res) {
 });
 
 router.get("/term/resources", function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     const termid = req.body.termid;
     const query = "SELECT id, link, linktype, language FROM term_resources where termid = $1";
     database
@@ -235,6 +242,8 @@ router.get("/contributors", authenticateToken, function (req, res) {
 });
 
 router.post("/contributor/login", async function (req, res) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     const email = req.body.email;
     
     const query =
