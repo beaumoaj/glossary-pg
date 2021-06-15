@@ -1,5 +1,13 @@
-import { Router } from "express";
-import jwt from "jsonwebtoken";
+const { Router } = require("express");
+const jwt = require("jsonwebtoken");
+const { database } = require("./db");
+
+const DBG = 1;
+function debug(message) {
+    if (DBG) {
+        console.log(message);
+    }
+}
 
 const USE_AUTH = 1;
 if (process.env.USE_AUTH === 'false') {
@@ -289,4 +297,4 @@ router.get("/", function (req, res) {
   res.send("Glossary Server v1.0");
 });
 
-export default router;
+module.exports = router;

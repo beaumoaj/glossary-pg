@@ -1,8 +1,8 @@
-import http from "http";
-import dotenv from "dotenv";
+const http = require("http");
+const dotenv = require("dotenv");
 
-import app from "./app";
-import { connectDb, disconnectDb } from "./db";
+const app = require("./app");
+const { connectDb, disconnectDb } = require("./db");
 
 dotenv.config();
 

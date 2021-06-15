@@ -1,4 +1,7 @@
-import { Pool } from "pg";
+const { Pool } = require("pg");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 const dbUrl = process.env.DATABASE_URL; // || "postgres://localhost:5432/cyf";
 
@@ -17,9 +20,11 @@ if (dbUrl) {
 		port: process.env.DB_PORT
 	};
 }
+console.log(process.cwd());
+console.log(config);
 const pool = new Pool(config);
 
-export const connectDb = async () => {
+exports.connectDb = async () => {
 	let client;
 	try {
 		client = await pool.connect();
@@ -31,6 +36,6 @@ export const connectDb = async () => {
 	client.release();
 };
 
-export const disconnectDb = () => pool.close();
+exports.disconnectDb = () => pool.close();
 
-export default { query: pool.query };
+exports.database = pool;

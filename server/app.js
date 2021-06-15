@@ -1,9 +1,9 @@
-import express from "express";
-import morgan from "morgan";
-import path from "path";
+const express = require("express");
+const morgan = require("morgan");
+const path = require("path");
 
-import router from "./api";
-import { configuredHelmet, httpsOnly, logErrors, pushStateRouting } from "./middleware";
+const router = require("./api");
+const { configuredHelmet, httpsOnly, logErrors, pushStateRouting } = require("./middleware");
 
 const apiRoot = "/api";
 const staticDir = path.join(__dirname, "static");
@@ -25,4 +25,4 @@ app.use(apiRoot, router);
 app.use(express.static(staticDir));
 app.use(pushStateRouting(apiRoot, staticDir));
 
-export default app;
+module.exports = app;
