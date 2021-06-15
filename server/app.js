@@ -1,6 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const path = require("path");
+const cors = require('cors');
 
 const router = require("./api");
 const { configuredHelmet, httpsOnly, logErrors, pushStateRouting } = require("./middleware");
@@ -9,6 +10,8 @@ const apiRoot = "/api";
 const staticDir = path.join(__dirname, "static");
 
 const app = express();
+
+app.use(cors())
 
 app.use(express.json());
 app.use(configuredHelmet());
