@@ -180,7 +180,7 @@ router.post("/terms/resources/delete", authenticateToken, function (req, res) {
         });
 });
 
-router.POST("/terms/term", function (req, res) {
+router.post("/terms/term", function (req, res) {
     const termid = req.body.termid;
     
     res.header("Access-Control-Allow-Origin", "*");
