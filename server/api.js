@@ -180,6 +180,30 @@ router.post("/terms/resources/delete", authenticateToken, function (req, res) {
         });
 });
 
+router.POST("/terms/term", function (req, res) {
+    const termid = req.body.termid;
+    
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+    const query = "SELECT id, term, definition FROM terms where id=$1";
+    database
+        .query(query, [termid])
+        .then((result) => {
+            debug(result);
+            if (result.rowCount === 0) {
+                res.json([]);
+            } else {
+                debug(result);
+                res.json(result.rows);
+            }
+        })
+        .catch((e) => {
+            console.error(e);
+            res.json({error: e});
+        });
+});
+
 router.get("/terms", function (req, res) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
