@@ -186,7 +186,7 @@ router.POST("/terms/term", function (req, res) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-    const query = "SELECT id, term, definition FROM terms where id=$1";
+    const query = "SELECT id, term, definition FROM terms where id = $1";
     database
         .query(query, [termid])
         .then((result) => {
