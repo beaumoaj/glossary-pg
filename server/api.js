@@ -200,7 +200,7 @@ router.post("/terms/term", function (req, res) {
             } else {
                 debug(result);
                 rows = [];
-                rows.forEach((r) => {
+                result.rows.forEach((r) => {
                     obj = {
                         'termid':r.id,
                         'term' : r.term,
