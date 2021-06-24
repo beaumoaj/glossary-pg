@@ -228,7 +228,7 @@ router.get("/terms", function (req, res) {
         });
 });
 
-router.get("/term/resources", function (req, res) {
+router.post("/term/resources", function (req, res) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     const termid = req.body.termid;
