@@ -201,7 +201,7 @@ router.post("/terms/term", function (req, res) {
                 debug(result);
                 const rows = [];
                 result.rows.forEach((r) => {
-                    obj = {
+                    const obj = {
                         'termid':r.id,
                         'term' : r.term,
                         'definition' : r.definition,
