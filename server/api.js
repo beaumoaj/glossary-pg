@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const { database } = require("./db");
 const bcrypt = require("bcrypt");
 
-const DBG = 1;
+const DBG = 0;
 function debug(message) {
     if (DBG) {
         console.log(message);
@@ -210,7 +210,6 @@ router.post("/terms/term", function (req, res) {
                 database
                     .query(query2,[termid])
                     .then((result2) => {
-                        console.log(`result2 rowcount is ${result2.rowCount}`); 
                         if (result2.rowCount > 0) {
                             result2.rows.forEach((r) => {
                                 obj.resources.push(r.resources);
