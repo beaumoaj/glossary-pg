@@ -31,14 +31,14 @@ function authenticateToken(req, res, next) {
         console.log(`auth token=${token}`);
         
         if (token == null) {
-            return res.json({error:401, message:"No auth token provided"});
+            return res.status(401).json({error:"401", message:"No auth token provided"});
         }
         
         jwt.verify(token, process.env.TOKEN_SECRET, (err, user) => {
             console.log(err)
             
             if (err) {
-                return res.json({error:403, message:"Auth token not valid"});
+                return res.status(403).json({error:"403", message:"Auth token not valid"});
             }
             
             req.user = user
