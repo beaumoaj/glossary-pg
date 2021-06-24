@@ -213,7 +213,7 @@ router.post("/terms/term", function (req, res) {
                         result2.rows.forEach((r) => {
                             obj.resources.push(r.resources);
                         });
-                        res.json(rows);
+                        res.json(obj);
                     })
             }
         })

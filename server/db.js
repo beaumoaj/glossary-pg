@@ -39,6 +39,6 @@ exports.connectDb = async () => {
 	client.release();
 };
 
-exports.disconnectDb = () => pool.close();
+exports.disconnectDb = () => pool.end();
 
 exports.database = pool;
