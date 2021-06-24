@@ -206,7 +206,7 @@ router.post("/terms/term", function (req, res) {
                     'resources':[]
                 };
                 debug(obj);
-                const query2 = "SELECT json_agg(json_build_object('resid',id, 'link',link,'type',linktype, 'language',language)) as resources FROM term_resources where termid = $1";
+                const query2 = "SELECT json_build_object('resid',id, 'link',link,'type',linktype, 'language',language) as resources FROM term_resources where termid = $1";
                 database
                     .query(query2,[termid])
                     .then((result2) => {
