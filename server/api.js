@@ -188,9 +188,9 @@ router.post("/terms/term", function (req, res) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
-    const query = "SELECT terms.id, terms.term, terms.definition, json_agg(json_build_object('resid',term_resources.termid, 'link',term_resources.link,'type',term_resources.linktype, 'language',term_resources.language)) as resources FROM terms INNER JOIN term_resources ON terms.id = $1 AND terms.id = term_resources.termid GROUP BY terms.id";
+    // const query = "SELECT terms.id, terms.term, terms.definition, json_agg(json_build_object('resid',term_resources.termid, 'link',term_resources.link,'type',term_resources.linktype, 'language',term_resources.language)) as resources FROM terms LEFT JOIN term_resources ON terms.id = $1 AND terms.id = term_resources.termid GROUP BY terms.id";
 
-    // const query = "SELECT id, term, definition FROM terms where id = $1";
+    const query = "SELECT id, term, definition FROM terms where id = $1";
     database
         .query(query, [termid])
         .then((result) => {
@@ -198,18 +198,23 @@ router.post("/terms/term", function (req, res) {
             if (result.rowCount === 0) {
                 res.json([]);
             } else {
-                debug(result);
-                const rows = [];
-                result.rows.forEach((r) => {
-                    const obj = {
-                        'termid':r.id,
-                        'term' : r.term,
-                        'definition' : r.definition,
-                        'resources':r.resources
-                    };
-                    rows.push(obj);
-                });
-                res.json(rows);
+                data = result.rows[0];
+                const obj = {
+                    'termid':data.id,
+                    'term' : data.term,
+                    'definition' : data.definition,
+                    'resources':[]
+                };
+                debug(obj);
+                const query2 = "SELECT json_agg(json_build_object('resid',id, 'link',link,'type',linktype, 'language',language)) as resources FROM term_resources where termid = $1";
+                database
+                    .query(query2,[termid])
+                    .then((result2) => {
+                        result2.rows.forEach((r) => {
+                            obj.resources.push(r.resources);
+                        });
+                        res.json(rows);
+                    })
             }
         })
         .catch((e) => {
