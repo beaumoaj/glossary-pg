@@ -210,6 +210,7 @@ router.post("/terms/term", function (req, res) {
                 database
                     .query(query2,[termid])
                     .then((result2) => {
+                        console.log(`result2 rowcount is ${result2.rowCount}`); 
                         if (result2.rowCount > 0) {
                             result2.rows.forEach((r) => {
                                 obj.resources.push(r.resources);
