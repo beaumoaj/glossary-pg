@@ -28,14 +28,14 @@ function authenticateToken(req, res, next) {
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1];
         
-        console.log(`auth token=${token}`);
+        debug(`auth token=${token}`);
         
         if (token == null) {
             return res.status(401).json({error:"401", message:"No auth token provided"});
         }
         
         jwt.verify(token, process.env.TOKEN_SECRET, (err, user) => {
-            console.log(err)
+            debug(err)
             
             if (err) {
                 return res.status(403).json({error:"403", message:"Auth token not valid"});
@@ -332,7 +332,7 @@ router.post("/newContributor", authenticateToken, async function (req, res) {
     const region = req.body.region;
     const pass = await bcrypt.hash(req.body.password, saltRounds)
 
-    console.log(`password is ${pass}`);
+    debug(`password is ${pass}`);
 
     const query =
           "INSERT INTO contributors (contributor_name, region, email, password) VALUES ($1,$2,$3,$4) RETURNING id";
