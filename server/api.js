@@ -198,7 +198,7 @@ router.post("/terms/term", function (req, res) {
             if (result.rowCount === 0) {
                 res.json([]);
             } else {
-                data = result.rows[0];
+                const data = result.rows[0];
                 const obj = {
                     'termid':data.id,
                     'term' : data.term,
