@@ -70,3 +70,151 @@ See the guidance in the [wiki].
   [React Router]: https://reactrouter.com/web
   [Webpack]: https://webpack.js.org/
   [wiki]: https://github.com/textbook/starter-kit/wiki
+
+
+## Glossary Project Back End
+
+This project uses a Postgres database.
+
+### Terms
+
+Terms consist of the term itself and its definition.  The database also holds the name of the contributor who created it (or last edited it), plus the creation date and the last edit date.  Each term has a unique `id`
+
+
+### Term resources
+
+Term resources are associated with a specific term.  They need the `id` of the term they are associated with, plus a `link` and a `linktype`.  The link type is either `video` (for YouTube or other video resources) or `web` for links to web sites.  Finally each term resource has a `language` property to identify the programming language.
+
+
+### Contributors
+
+Contributors are users who can update the database.
+
+
+### Administration
+
+Admin users are another kind of user
+
+
+### Authentication
+
+The API uses JSON Web Tokens for authentication.  The `/contributor/login` function will return a token which is valid for one hour, and a user ID.
+```
+{
+    "auth": "eyJhbGciOiJIUz..",
+    "userid":userid
+}
+```
+The client should return an `Authorization` header containing the token for all operations that add/edit/delete terms or their resources.  The header should look like this:
+```
+Authorization: Bearer "eyJhbGciOiJIUz.."
+```
+
+See [https://www.digitalocean.com/community/tutorials/nodejs-jwt-expressjs](https://www.digitalocean.com/community/tutorials/nodejs-jwt-expressjs) for a tutorial on this kind of authentication.
+
+### Environment configuration
+
+The `.env` file for the API server should look like this:
+```
+TOKEN_SECRET=
+DB_HOST=localhost
+DB_USER=user
+DB_PORT=3306
+DB_PASSWORD=password
+DB_NAME= glossary
+WEB_PORT=3000
+USE_AUTH=true
+```
+
+The `TOKEN_SECRET` is generated with
+```
+require('crypto').randomBytes(64).toString('hex')
+```
+The `USE_AUTH` variable should be set to either `true` or `false`.  If you set it to `false`, the API will **not** use any authentication.
+Adjust the other environment variables according to your system.
+
+### API
+
+Here is a list of the API functions.  The ones labelled with `(AUTH)` require authorization as described above.
+
+1. `GET /terms` will return all terms as a JSON list
+2. `POST /terms/add` will insert a new term.  Parameters are `term`, `definition`, and `contributorId` (AUTH)
+3. `POST /terms/update` will update a term.  Parameters are `termid`, `term`, `definition`, `contributorId` (AUTH)
+4. `POST /terms/delete` will delete a term.  Parameters are `termid` (AUTH)
+5. `GET /term/resources` will return all resources associated with a term.  Parameters are `termid`
+6. `POST /terms/resources/add` will insert a new resource for a specific term.  Parameters are `termid`, `link`, `linktype` (`video` or `web`), `language` (AUTH)
+7. `POST /terms/resources/update` will update a resource for a specific term.  Parameters are `resourceid`, `termid`, `link`, `linktype` (`video` or `web`), `language` (AUTH)
+8. `POST /terms/resources/delete` will delete a resource.  Parameters are `resourceid` (AUTH)
+9. `GET /contributors` will return a list of contributors (id, name and email) (AUTH)
+10. `POST /contributor/login` checks the email and password of a contributor and returns an auth token as described above.  Parameters are `email`, `password`.
+11. `POST /newContributor` adds a new contributor to the database.  Parameters are `name`, `email`, `region`, `password`. (AUTH)
+
+### Database
+
+There are four tables:
+1. `admins` containing administrator users (no API functions yet)
+   ```
+   Table "public.admins"
+        Column     |          Type          | Collation | Nullable |              Default               
+   ----------------+------------------------+-----------+----------+------------------------------------
+    id             | integer                |           | not null | nextval('admins_id_seq'::regclass)
+    admin_name     | character varying(100) |           | not null | 
+    email          | character varying(100) |           |          | 
+    admin_password | character varying(30)  |           |          | 
+   Indexes:
+       "admins_pkey" PRIMARY KEY, btree (id)
+   ```
+2. `contributors` containing all the contributors.
+   ```
+   Table "public.contributors"
+         Column      |          Type          | Collation | Nullable |                 Default                  
+   ------------------+------------------------+-----------+----------+------------------------------------------
+    id               | integer                |           | not null | nextval('contributors_id_seq'::regclass)
+    contributor_name | character varying(120) |           | not null | 
+    region           | character varying(20)  |           | not null | 
+    email            | character varying(30)  |           |          | 
+    password         | text                   |           | not null | 
+   Indexes:
+       "contributors_pkey" PRIMARY KEY, btree (id)
+   Referenced by:
+       TABLE "terms" CONSTRAINT "terms_contributor_id_fkey" FOREIGN KEY (contributor_id) REFERENCES contributors(id)
+   ```
+3. `terms` containing all the terms.  Terms require a valid contributor `id`.
+    ```
+    Table "public.terms"
+        Column     |            Type             | Collation | Nullable |          
+       Default              
+   ----------------+-----------------------------+-----------+----------+-----------------------------------
+    id             | integer                     |           | not null | nextval('terms_id_seq'::regclass)
+    term           | character varying(30)       |           | not null | 
+    definition     | text                        |           | not null | 
+    contributor_id | integer                     |           |          | 
+    creation_date  | timestamp without time zone |           |          | CURRENT_TIMESTAMP
+    last_edit_date | timestamp without time zone |           |          | 
+   Indexes:
+       "terms_pkey" PRIMARY KEY, btree (id)
+   Foreign-key constraints:
+       "terms_contributor_id_fkey" FOREIGN KEY (contributor_id) REFERENCES contributors(id)
+   Referenced by:
+       TABLE "term_resources" CONSTRAINT "term_resources_termid_fkey" FOREIGN KEY (termid) REFERENCES terms(id)
+   Triggers:
+       set_timestamp BEFORE UPDATE ON terms FOR EACH ROW EXECUTE FUNCTION trigger_set_timestamp()
+   ```
+4. `term_resources` this table will allow a link to be associated with a term.  It requires a term `id` and a `linktype` which is either `video` or `web`.
+    ```
+    Table "public.term_resources"
+      Column  |          Type          | Collation | Nullable |                  Default                   
+    ----------+------------------------+-----------+----------+--------------------------------------------
+     id       | integer                |           | not null | nextval('term_resources_id_seq'::regclass)
+     termid   | integer                |           |          | 
+     link     | text                   |           | not null | 
+     linktype | link_t                 |           | not null | 
+     language | character varying(255) |           | not null | 
+    Indexes:
+        "term_resources_pkey" PRIMARY KEY, btree (id)
+    Foreign-key constraints:
+        "term_resources_termid_fkey" FOREIGN KEY (termid) REFERENCES terms(id)
+    ```
+
+
+### To Do
