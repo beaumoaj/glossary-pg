@@ -105,11 +105,7 @@ router.post("/terms/delete", authenticateToken, function (req, res) {
           "DELETE from terms WHERE id = $1";
     
     database
-        .query(query2, [termid])
-        .then((result1) => {
-            debug(result1);
-            query(query, [termid])
-        })
+        .query(query, [termid])
         .then((result) => {
             debug(result);
             if (result.rowCount === 0) {
