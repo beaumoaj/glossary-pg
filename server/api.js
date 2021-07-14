@@ -103,15 +103,12 @@ router.post("/terms/delete", function (req, res) {
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
     const r = {};
-    // const query = "DELETE from term_resources where termid = $1"
     const query = "WITH deleted AS (DELETE FROM term_resources WHERE termid = $1 RETURNING *) SELECT count(*) AS dcount FROM deleted";
     database
         .query(query, [termid])
         .then((result) => {
             debug(result);
-            // r['resources'] = `${result.rows[0].deleted} Resources deleted.`;
             r['resources'] = `${result.rows[0].dcount} Resources deleted.`;
-            // const query2 = "DELETE from terms WHERE id = $1";
             const query2 = "WITH deleted AS (DELETE from terms WHERE id = $1  RETURNING *) SELECT count(*) as dcount FROM deleted";
             database
                 .query(query2,[termid])
@@ -130,10 +127,10 @@ router.post("/terms/delete", function (req, res) {
         });
 });
 
+/*
+// old version of delete
 router.post("/terms/delete", authenticateToken, function (req, res) {
     const termid = req.body.termid;
-
-    const query2 = "DELETE from term_resources where termid = $1"
 
     const query =
           "DELETE from terms WHERE id = $1";
@@ -153,6 +150,7 @@ router.post("/terms/delete", authenticateToken, function (req, res) {
             res.json({error: e});
         });
 });
+*/
 
 router.post("/terms/resources/add", authenticateToken, function (req, res) {
     const termid = req.body.termid;
