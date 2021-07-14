@@ -96,6 +96,39 @@ router.post("/terms/update", authenticateToken, function (req, res) {
         });
 });
 
+router.post("/terms/delete1", function (req, res) {
+    const termid = req.body.termid;
+    
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
+    const r = {};
+    // const query = "DELETE from term_resources where termid = $1"
+    const query = "WITH deleted AS (DELETE FROM term_resources WHERE termid = $1 RETURNING *) SELECT count(*) FROM deleted";
+    database
+        .query(query, [termid])
+        .then((result) => {
+            debug(result);
+            r['message'] = `${result.rows[0].deleted} Resources deleted.`;
+            // const query2 = "DELETE from terms WHERE id = $1";
+            const query2 = "WITH deleted AS (DELETE from terms WHERE id = $1 RETURNING *) SELECT count(*) FROM deleted";
+            database
+                .query(query2,[termid])
+                .then((result2) => {
+                    r['message'] = `${result['message']} ${result2.rows[0].deleted} term deleted`;
+                    res.json(r);
+                })
+                .catch((e) => {
+                    console.error(e);
+                    res.json({error: `Error in inner query ${query2}`});
+                });
+        })
+        .catch((e) => {
+            console.error(e);
+            res.json({error: `Error in outer query ${query}`});
+        });
+});
+
 router.post("/terms/delete", authenticateToken, function (req, res) {
     const termid = req.body.termid;
 
