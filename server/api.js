@@ -104,21 +104,20 @@ router.post("/terms/delete1", function (req, res) {
 
     const r = {};
     // const query = "DELETE from term_resources where termid = $1"
-    const query = "WITH deleted AS (DELETE FROM term_resources WHERE termid = $1 RETURNING *) SELECT count(*) FROM deleted";
+    const query = "WITH deleted AS (DELETE FROM term_resources WHERE termid = $1 RETURNING *) SELECT count(*) AS dcount FROM deleted";
     database
         .query(query, [termid])
         .then((result) => {
             debug(result);
             // r['resources'] = `${result.rows[0].deleted} Resources deleted.`;
-            r['resources'] = `${result.rowCount} Resources deleted.`;
+            r['resources'] = `${result.rowCount} ${result.rows[0].dcount} Resources deleted.`;
             // const query2 = "DELETE from terms WHERE id = $1";
-            const query2 = "WITH deleted AS (DELETE from terms WHERE id = $1  RETURNING *) SELECT count(*) FROM deleted";
+            const query2 = "WITH deleted AS (DELETE from terms WHERE id = $1  RETURNING *) SELECT count(*) as dcount FROM deleted";
             database
                 .query(query2,[termid])
                 .then((result2) => {
-                    r['term'] = `${result2.rowCount} term deleted`;
-                    r['message'] = `All done for term ${termid}`
-                    res.json(r);
+                    r['term'] = `${result2.rowCount} ${result2.rows[0].dcount} term deleted`;
+                    res.json({message: `${r.resources} ${r.term});
                 })
                 .catch((e) => {
                     console.error(e);
