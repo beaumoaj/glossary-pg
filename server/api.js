@@ -109,13 +109,15 @@ router.post("/terms/delete1", function (req, res) {
         .query(query, [termid])
         .then((result) => {
             debug(result);
-            r['message'] = `${result.rows[0].deleted} Resources deleted.`;
+            // r['resources'] = `${result.rows[0].deleted} Resources deleted.`;
+            r['resources'] = `${result.rowCount} Resources deleted.`;
             // const query2 = "DELETE from terms WHERE id = $1";
-            const query2 = "WITH deleted AS (DELETE from terms WHERE id = $1 RETURNING *) SELECT count(*) FROM deleted";
+            const query2 = "WITH deleted AS (DELETE from terms WHERE id = $1  RETURNING *) SELECT count(*) FROM deleted";
             database
                 .query(query2,[termid])
                 .then((result2) => {
-                    r['message'] = `${result['message']} ${result2.rows[0].deleted} term deleted`;
+                    r['term'] = `${result2.rowCount} term deleted`;
+                    r['message'] = `All done for term ${termid}`
                     res.json(r);
                 })
                 .catch((e) => {
