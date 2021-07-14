@@ -117,7 +117,7 @@ router.post("/terms/delete1", function (req, res) {
                 .query(query2,[termid])
                 .then((result2) => {
                     r['term'] = `${result2.rowCount} ${result2.rows[0].dcount} term deleted`;
-                    res.json({message: `${r.resources} ${r.term}`);
+                    res.json({message: `${r.resources} ${r.term}`});
                 })
                 .catch((e) => {
                     console.error(e);
